@@ -14,8 +14,8 @@ export const checklistData = [
             { id: 'anhaenger_auflieger', label: 'Anhänger/Auflieger', fixed: true },
             { id: 'fahrer', label: 'Fahrer' },
             { id: 'monat', label: 'Monat', isMonthSelector: true },
-            { id: 'datum_am', label: 'am' },
-            { id: 'km_stand', label: 'Km-Stand' },
+            { id: 'datum_am', label: 'am', inputType: 'date' },
+            { id: 'km_stand', label: 'Km-Stand', inputType: 'number' },
         ]
     },
     {

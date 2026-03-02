@@ -144,10 +144,10 @@ function App() {
               </div>
             ) : (
               <input
-                type="text"
+                type={item.inputType || "text"}
                 value={formData[item.id] ?? ""}
                 onChange={(e) => updateField(item.id, e.target.value)}
-                placeholder="..."
+                placeholder={item.inputType === "date" ? "TT.MM.JJJJ" : "..."}
                 className={item.fixed ? "fixed-input" : ""}
                 aria-required={isRequiredField(item.id)}
               />
@@ -177,7 +177,7 @@ function App() {
                 <td className="col-item">{item.label}</td>
                 <td className="col-ist">
                   <input
-                    type="text"
+                    type="number"
                     value={formData[`${item.id}_ist`] ?? ""}
                     onChange={(e) =>
                       updateField(`${item.id}_ist`, e.target.value)
