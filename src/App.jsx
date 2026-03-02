@@ -2,7 +2,11 @@ import { useState, useMemo, useCallback } from "react";
 import { checklistData } from "./data/checklistData";
 import { useFormData } from "./hooks/useFormData";
 import { MONTHS } from "./constants";
-import { isRequiredField, isFormComplete } from "./utils/validationUtils";
+import {
+  isRequiredField,
+  isFormComplete,
+  getMissingFields,
+} from "./utils/validationUtils";
 import {
   exportToHTML,
   exportToJSON,
@@ -45,6 +49,11 @@ function App() {
   );
   const formComplete = useMemo(
     () => isFormComplete(formData, checklistData),
+    [formData]
+  );
+
+  const missingFields = useMemo(
+    () => getMissingFields(formData, checklistData),
     [formData]
   );
 
@@ -701,6 +710,30 @@ function App() {
                 Befüllung der Word-Vorlage. Alle Pflichtfelder müssen ausgefüllt
                 sein.
               </p>
+              {!formComplete && missingFields.length > 0 && (
+                <div
+                  className="missing-fields"
+                  style={{
+                    background: "#3d2817",
+                    border: "1px solid #fbbf24",
+                    borderRadius: "6px",
+                    padding: "10px",
+                    marginBottom: "15px",
+                    fontSize: "0.8rem",
+                  }}>
+                  <strong style={{ color: "#fbbf24" }}>Fehlende Felder:</strong>
+                  <ul
+                    style={{
+                      margin: "8px 0 0 0",
+                      paddingLeft: "20px",
+                      color: "#e0e0e0",
+                    }}>
+                    {missingFields.map((field, index) => (
+                      <li key={index}>{field}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="sync-buttons">
                 <button
                   className="btn btn-primary"
