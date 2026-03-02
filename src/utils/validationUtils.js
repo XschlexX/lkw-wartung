@@ -37,6 +37,10 @@ export const getMissingFields = (formData, checklistData) => {
     if (vollstaendigkeit) {
         const missingIst = [];
         for (const item of vollstaendigkeit.items) {
+            // Atemschutzmaske und Fluchthaube sind optional
+            if (item.id === "atemschutzmaske" || item.id === "fluchthaube") {
+                continue;
+            }
             const istValue = formData[`${item.id}_ist`];
             if (!istValue || istValue.trim() === "") {
                 missingIst.push(item.label);
@@ -91,6 +95,10 @@ export const isFormComplete = (formData, checklistData) => {
     );
     if (vollstaendigkeit) {
         for (const item of vollstaendigkeit.items) {
+            // Atemschutzmaske und Fluchthaube sind optional
+            if (item.id === "atemschutzmaske" || item.id === "fluchthaube") {
+                continue;
+            }
             const istValue = formData[`${item.id}_ist`];
             if (!istValue || istValue.trim() === "") {
                 return false;
