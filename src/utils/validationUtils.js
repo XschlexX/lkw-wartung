@@ -1,6 +1,32 @@
 import { REQUIRED_FIELDS } from "../constants";
 
 /**
+ * Konvertiert deutsches Datumsformat (TT.MM.JJJJ) zu ISO-Format (JJJJ-MM-TT)
+ * für HTML5 date inputs.
+ */
+export const convertGermanDateToISO = (germanDate) => {
+    if (!germanDate || typeof germanDate !== "string") return "";
+    const parts = germanDate.split(".");
+    if (parts.length !== 3) return "";
+    const [day, month, year] = parts;
+    // Jahr auf 4 Stellen erweitern falls nötig
+    const fullYear = year.length === 2 ? `20${year}` : year;
+    return `${fullYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+};
+
+/**
+ * Konvertiert ISO-Datumsformat (JJJJ-MM-TT) zu deutschem Format (TT.MM.JJJJ)
+ * für die interne Speicherung.
+ */
+export const convertISODateToGerman = (isoDate) => {
+    if (!isoDate || typeof isoDate !== "string") return "";
+    const parts = isoDate.split("-");
+    if (parts.length !== 3) return "";
+    const [year, month, day] = parts;
+    return `${day}.${month}.${year}`;
+};
+
+/**
  * Prüft, ob ein Feld ein Pflichtfeld ist.
  */
 export const isRequiredField = (itemId) => REQUIRED_FIELDS.includes(itemId);

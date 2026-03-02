@@ -6,6 +6,8 @@ import {
   isRequiredField,
   isFormComplete,
   getMissingFields,
+  convertGermanDateToISO,
+  convertISODateToGerman,
 } from "./utils/validationUtils";
 import {
   exportToHTML,
@@ -154,8 +156,20 @@ function App() {
             ) : (
               <input
                 type={item.inputType || "text"}
-                value={formData[item.id] ?? ""}
-                onChange={(e) => updateField(item.id, e.target.value)}
+                value={
+                  item.inputType === "date"
+                    ? formData[item.id]
+                      ? convertGermanDateToISO(formData[item.id])
+                      : ""
+                    : formData[item.id] ?? ""
+                }
+                onChange={(e) => {
+                  const value =
+                    item.inputType === "date" && e.target.value
+                      ? convertISODateToGerman(e.target.value)
+                      : e.target.value;
+                  updateField(item.id, value);
+                }}
                 placeholder={item.inputType === "date" ? "TT.MM.JJJJ" : "..."}
                 className={item.fixed ? "fixed-input" : ""}
                 aria-required={isRequiredField(item.id)}

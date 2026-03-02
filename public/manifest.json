@@ -2,24 +2,20 @@
   "name": "LKW Wartung",
   "short_name": "LKW Wartung",
   "description": "Monatliche LKW Wartungs-Checkliste",
-  "start_url": "/lkw-wartung/",
-  "scope": "/lkw-wartung/",
+  "start_url": ".",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#2c3e50",
   "icons": [
     {
-      "src": "/lkw-wartung/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "/lkw-wartung/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
