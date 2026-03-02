@@ -1,0 +1,638 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+/* App Container - iPhone 16 Pro Max Breite (430px) */
+.app {
+    max-width: 430px;
+    margin: 0 auto;
+    padding-bottom: 100px;
+    background: #16213e;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Desktop: Dunkler Hintergrund um die App */
+@media (min-width: 431px) {
+    body {
+        background-color: #0f0f23;
+    }
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.header p {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* Page Navigation */
+.page-nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.page-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.page-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.page-btn.active {
+    background: #3498db;
+}
+
+/* Content */
+.content {
+    padding: 15px;
+}
+
+/* Section */
+.section {
+    background: #1f2937;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.section h2 {
+    font-size: 1rem;
+    color: #60a5fa;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3b82f6;
+}
+
+/* Header Data Grid */
+.header-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.header-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.header-field label {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.header-field input {
+    padding: 10px;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+    background: #111827;
+    color: #e0e0e0;
+}
+
+.header-field input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Fixed Fields */
+.fixed-field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fixed-badge {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.fixed-input {
+    background: #1e3a5f !important;
+    border-color: #3b82f6 !important;
+    font-weight: 500;
+    color: #e0e0e0 !important;
+}
+
+/* Month Selector */
+.month-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.month-input {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    background: #111827;
+    border: 2px solid #3b82f6;
+    border-radius: 6px;
+    padding: 10px;
+    color: #e0e0e0;
+}
+
+.month-arrow {
+    width: 36px;
+    height: 40px;
+    font-size: 1rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.month-arrow:hover {
+    background: #2980b9;
+}
+
+.month-arrow:active {
+    transform: scale(0.95);
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+th {
+    background: #374151;
+    padding: 10px 8px;
+    text-align: left;
+    font-weight: 600;
+    color: #e0e0e0;
+    border-bottom: 2px solid #4b5563;
+}
+
+td {
+    padding: 8px;
+    border-bottom: 1px solid #374151;
+    vertical-align: middle;
+}
+
+tr:hover {
+    background: #2d3748;
+}
+
+.col-item {
+    min-width: 150px;
+}
+
+.col-ist,
+.col-soll,
+.col-ok {
+    width: 60px;
+    text-align: center;
+}
+
+.col-ablauf,
+.col-wann,
+.col-datum {
+    width: 100px;
+    text-align: center;
+}
+
+.col-rechts,
+.col-links {
+    width: 70px;
+    text-align: center;
+}
+
+/* Input Styles */
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #4b5563;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-align: center;
+    background: #111827;
+    color: #e0e0e0;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+/* Profiltiefen Table */
+.profiltiefen-table {
+    font-size: 0.8rem;
+}
+
+.profiltiefen-table th {
+    text-align: center;
+    padding: 8px 4px;
+}
+
+.profiltiefen-table td {
+    padding: 6px 4px;
+}
+
+.col-achse {
+    width: 20%;
+    font-weight: 500;
+}
+
+.col-re,
+.col-li {
+    width: 20%;
+    text-align: center;
+}
+
+.col-profiltiefe {
+    padding: 4px !important;
+}
+
+.profiltiefe-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
+}
+
+.profiltiefe-input {
+    width: 50px;
+    padding: 6px 4px;
+    text-align: center;
+    border: 1px solid #4b5563;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    appearance: textfield;
+    -moz-appearance: textfield;
+    background: #111827;
+    color: #e0e0e0;
+}
+
+.profiltiefe-input::-webkit-outer-spin-button,
+.profiltiefe-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.arrow-btn {
+    width: 24px;
+    height: 28px;
+    border: 1px solid #4b5563;
+    border-radius: 4px;
+    background: #374151;
+    cursor: pointer;
+    font-size: 0.7rem;
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.arrow-btn:hover {
+    background: #4b5563;
+    border-color: #3b82f6;
+}
+
+.arrow-btn:active {
+    background: #3b82f6;
+    color: white;
+}
+
+/* OK Button */
+.ok-btn {
+    width: 40px;
+    height: 32px;
+    border: 2px solid #4b5563;
+    border-radius: 6px;
+    background: #1f2937;
+    cursor: pointer;
+    font-weight: bold;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+
+.ok-btn:hover {
+    border-color: #3b82f6;
+}
+
+.ok-btn.active {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+/* Soll Value */
+.soll-value {
+    font-weight: bold;
+    color: #9ca3af;
+}
+
+/* Highlight Row */
+.highlight {
+    background: #3d2817 !important;
+}
+
+.highlight td {
+    font-weight: 500;
+    color: #fbbf24;
+}
+
+/* Text Area for Mängel */
+.maengel-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.maengel-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #4b5563;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: #111827;
+    color: #e0e0e0;
+}
+
+.maengel-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+/* Signature Section */
+.signature-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.signature-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.signature-field label {
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+.signature-field input {
+    padding: 12px;
+    border: none;
+    border-bottom: 2px solid #3b82f6;
+    background: #111827;
+    font-size: 0.95rem;
+    color: #e0e0e0;
+}
+
+.signature-field input:focus {
+    outline: none;
+    background: #1f2937;
+}
+
+/* Button Container */
+.button-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1f2937;
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    max-width: 430px;
+    margin: 0 auto;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button-container .btn:not(.btn-icon) {
+    flex: 1;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #219a52;
+}
+
+.btn-secondary {
+    background: #374151;
+    color: #e0e0e0;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.btn-icon {
+    background: #34495e;
+    color: white;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.btn-icon:hover {
+    background: #2c3e50;
+}
+
+/* Sync Section */
+.sync-section {
+    background: #1f2937;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 0 15px 20px 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sync-section h3 {
+    font-size: 1rem;
+    color: #60a5fa;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sync-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sync-buttons .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.file-input-label {
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.sync-hint {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin-top: 15px;
+    padding: 10px;
+    background: #111827;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* Default Section */
+.default-section {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #374151;
+}
+
+.default-section h4 {
+    font-size: 0.95rem;
+    color: #60a5fa;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+/* Print Styles */
+@media print {
+    .header {
+        position: static;
+    }
+
+    .button-container,
+    .page-nav {
+        display: none;
+    }
+
+    .section {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
+
+    .content {
+        padding: 10px;
+    }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.2rem;
+    }
+
+    .section {
+        padding: 12px;
+    }
+
+    table {
+        font-size: 0.8rem;
+    }
+
+    th,
+    td {
+        padding: 6px 4px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        padding: 4px;
+        font-size: 0.8rem;
+    }
+
+    .ok-btn {
+        width: 36px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+}
