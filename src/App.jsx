@@ -74,6 +74,9 @@ function App() {
 
     const updates = {};
     section.items.forEach((item) => {
+      // Überspringe optionale Felder
+      if (item.id === "modulasi_system") return;
+
       updates[`${item.id}_ok`] = true;
       updates[`${item.id}_wann`] = formattedDate;
     });
@@ -117,6 +120,216 @@ function App() {
     }.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Prüft ob alle Pflichtfelder ausgefüllt sind
+  const isFormComplete = () => {
+    const requiredFields = [
+      "kennzeichen_zug",
+      "anhaenger_auflieger",
+      "fahrer",
+      "monat",
+      "datum_am",
+      "km_stand",
+    ];
+
+    // Prüfe Header-Felder
+    for (const field of requiredFields) {
+      if (!formData[field] || formData[field].trim() === "") {
+        return false;
+      }
+    }
+
+    // Prüfe Vollständigkeit (Ist-Werte)
+    const vollstaendigkeit = checklistData.find(
+      (s) => s.id === "vollstaendigkeit"
+    );
+    if (vollstaendigkeit) {
+      for (const item of vollstaendigkeit.items) {
+        const istValue = formData[`${item.id}_ist`];
+        if (!istValue || istValue.trim() === "") {
+          return false;
+        }
+      }
+    }
+
+    // Prüfe Zustand (OK-Status)
+    const zustandSections = checklistData.filter((s) => s.hasOkWann);
+    for (const section of zustandSections) {
+      for (const item of section.items) {
+        if (!formData[`${item.id}_ok`]) {
+          return false;
+        }
+      }
+    }
+
+    // Prüfe Unterschriften
+    const unterschriften = checklistData.find((s) => s.id === "unterschriften");
+    if (unterschriften) {
+      for (const item of unterschriften.items) {
+        if (!formData[item.id] || formData[item.id].trim() === "") {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
+
+  // Erstellt eine Word-optimierte Export-Datei mit Platzhaltern
+  const exportForWord = () => {
+    if (!isFormComplete()) {
+      alert(
+        "Bitte fülle alle Pflichtfelder aus:\n- Fahrzeugdaten (Kennzeichen, Anhänger, Fahrer, Monat, Datum, KM)\n- Alle Ist-Werte in der Vollständigkeits-Kontrolle\n- Alle OK-Checkboxen im Zustand\n- Alle Unterschriften"
+      );
+      return;
+    }
+
+    // Erstelle strukturierte Daten für Word-Platzhalter
+    const wordData = {
+      // Metadaten
+      _meta: {
+        exportDatum: new Date().toLocaleDateString("de-DE"),
+        exportZeit: new Date().toLocaleTimeString("de-DE"),
+        version: "1.0",
+      },
+
+      // Fahrzeugdaten - direkt als Platzhalter
+      KENNZEICHEN_ZUG: formData["kennzeichen_zug"] || "",
+      KENNZEICHEN_ANHAENGER: formData["anhaenger_auflieger"] || "",
+      G_NUMMER: formData["g_nummer"] || "",
+      FAHRER: formData["fahrer"] || "",
+      MONAT: formData["monat"] || "",
+      DATUM_AM: formData["datum_am"] || "",
+      KM_STAND: formData["km_stand"] || "",
+
+      // Vollständigkeit - dynamisch generiert
+      ...generateVollstaendigkeitData(),
+
+      // Profiltiefen
+      ...generateProfiltiefenData(),
+
+      // Zustand
+      ...generateZustandData(),
+
+      // Wartungsarbeiten
+      ...generateWartungsarbeitenData(),
+
+      // Mängel
+      ...generateMaengelData(),
+
+      // Unterschriften
+      UNTERSCHRIFT_FAHRER: formData["unterschrift_fahrer"] || "",
+      AUSGEWERTET_DURCH: formData["ausgewertet_durch"] || "",
+      AUSGEWERTET_AM: formData["ausgewertet_am"] || "",
+    };
+
+    const dataStr = JSON.stringify(wordData, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `word-export-${formData["kennzeichen_zug"] || "lkw"}-${
+      formData["monat"] || ""
+    }.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Hilfsfunktion: Vollständigkeits-Daten generieren
+  const generateVollstaendigkeitData = () => {
+    const data = {};
+    const section = checklistData.find((s) => s.id === "vollstaendigkeit");
+    if (!section) return data;
+
+    section.items.forEach((item, index) => {
+      const prefix = `VOLL_${String(index + 1).padStart(2, "0")}`;
+      data[`${prefix}_LABEL`] = item.label;
+      data[`${prefix}_IST`] = formData[`${item.id}_ist`] || "";
+      data[`${prefix}_SOLL`] = item.soll || "";
+      data[`${prefix}_ABLAUF`] = formData[`${item.id}_ablauf`] || "";
+    });
+
+    return data;
+  };
+
+  // Hilfsfunktion: Profiltiefen-Daten generieren
+  const generateProfiltiefenData = () => {
+    const data = {};
+    const achsen = [
+      "lkw_a_achse",
+      "lkw_b_achse",
+      "lkw_c_achse",
+      "ah_al_a_achse",
+      "ah_al_b_achse",
+      "ah_al_c_achse",
+    ];
+
+    achsen.forEach((achse, index) => {
+      const prefix = `PROFIL_${String(index + 1).padStart(2, "0")}`;
+      const labels = {
+        lkw_a_achse: "LKW A-Achse",
+        lkw_b_achse: "LKW B-Achse",
+        lkw_c_achse: "LKW C-Achse",
+        ah_al_a_achse: "AH/AL A-Achse",
+        ah_al_b_achse: "AH/AL B-Achse",
+        ah_al_c_achse: "AH/AL C-Achse",
+      };
+
+      data[`${prefix}_LABEL`] = labels[achse];
+      data[`${prefix}_RE1`] = formData[`${achse}_re1`] || "";
+      data[`${prefix}_RE2`] = formData[`${achse}_re2`] || "";
+      data[`${prefix}_LI1`] = formData[`${achse}_li1`] || "";
+      data[`${prefix}_LI2`] = formData[`${achse}_li2`] || "";
+    });
+
+    return data;
+  };
+
+  // Hilfsfunktion: Zustand-Daten generieren
+  const generateZustandData = () => {
+    const data = {};
+    const sections = checklistData.filter((s) => s.hasOkWann);
+    let counter = 1;
+
+    sections.forEach((section) => {
+      section.items.forEach((item) => {
+        const prefix = `ZUSTAND_${String(counter).padStart(2, "0")}`;
+        data[`${prefix}_LABEL`] = item.label;
+        data[`${prefix}_OK`] = formData[`${item.id}_ok`] ? "Ja" : "Nein";
+        data[`${prefix}_WANN`] = formData[`${item.id}_wann`] || "";
+        counter++;
+      });
+    });
+
+    return data;
+  };
+
+  // Hilfsfunktion: Wartungsarbeiten-Daten generieren
+  const generateWartungsarbeitenData = () => {
+    const data = {};
+    const section = checklistData.find((s) => s.id === "wartungsarbeiten");
+    if (!section) return data;
+
+    section.items.forEach((item, index) => {
+      const prefix = `WARTUNG_${String(index + 1).padStart(2, "0")}`;
+      data[`${prefix}_LABEL`] = item.label;
+      data[`${prefix}_SZM`] = formData[`${item.id}_szm`] || "";
+      data[`${prefix}_AHAL`] = formData[`${item.id}_ahal`] || "";
+    });
+
+    return data;
+  };
+
+  // Hilfsfunktion: Mängel-Daten generieren
+  const generateMaengelData = () => {
+    const data = {};
+
+    for (let i = 1; i <= 6; i++) {
+      data[`MAENGEL_${i}`] = formData[`maengel_${i}`] || "";
+    }
+
+    return data;
   };
 
   const saveAsDefault = () => {
@@ -214,6 +427,19 @@ function App() {
     updateField("monat", months[newIndex]);
   };
 
+  // Hilfsfunktion: Prüft ob ein Feld ein Pflichtfeld ist
+  const isRequiredField = (itemId) => {
+    const requiredFields = [
+      "kennzeichen_zug",
+      "anhaenger_auflieger",
+      "fahrer",
+      "monat",
+      "datum_am",
+      "km_stand",
+    ];
+    return requiredFields.includes(itemId);
+  };
+
   const renderHeaderSection = (section) => (
     <div key={section.id} className="section">
       <div className="header-grid">
@@ -223,6 +449,13 @@ function App() {
             className={`header-field ${item.fixed ? "fixed-field" : ""}`}>
             <label>
               {item.label}
+              {isRequiredField(item.id) && (
+                <span
+                  className="required-star"
+                  style={{ color: "red", marginLeft: "4px" }}>
+                  *
+                </span>
+              )}
               {item.fixed && <span className="fixed-badge">💾</span>}
             </label>
             {item.isMonthSelector ? (
@@ -284,7 +517,13 @@ function App() {
                     onChange={(e) =>
                       updateField(`${item.id}_ist`, e.target.value)
                     }
+                    required
                   />
+                  {!formData[`${item.id}_ist`] && 
+                   item.id !== 'atemschutzmaske' && 
+                   item.id !== 'fluchthaube' && (
+                    <span style={{ color: "red", marginLeft: "4px" }}>*</span>
+                  )}
                 </td>
                 <td className="col-soll">
                   <span className="soll-value">{item.soll || ""}</span>
@@ -310,14 +549,15 @@ function App() {
   );
 
   const renderProfiltiefenRechtsTable = (section) => {
-    const positions = ["re1", "re2"];
-
     const adjustValue = (itemId, pos, delta) => {
       const key = `${itemId}_${pos}`;
       const current = parseFloat(formData[key]) || 0;
       const newValue = Math.max(0, current + delta);
       updateField(key, newValue.toString());
     };
+
+    // Nur LKW B-Achse hat "Rechts innen"
+    const hasInnerColumn = (itemId) => itemId === "lkw_b_achse";
 
     return (
       <div key={section.id} className="section">
@@ -332,38 +572,47 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {section.items.map((item) => (
-                <tr key={item.id}>
-                  <td className="col-achse">{item.label}</td>
-                  {positions.map((pos) => (
-                    <td key={pos} className="col-profiltiefe">
-                      <div className="profiltiefe-input-wrapper">
-                        <button
-                          className="arrow-btn down"
-                          onClick={() => adjustValue(item.id, pos, -1)}>
-                          ▼
-                        </button>
-                        <input
-                          type="number"
-                          step="1"
-                          min="0"
-                          value={formData[`${item.id}_${pos}`] || ""}
-                          onChange={(e) =>
-                            updateField(`${item.id}_${pos}`, e.target.value)
-                          }
-                          placeholder="mm"
-                          className="profiltiefe-input"
-                        />
-                        <button
-                          className="arrow-btn up"
-                          onClick={() => adjustValue(item.id, pos, 1)}>
-                          ▲
-                        </button>
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {section.items.map((item) => {
+                const positions = hasInnerColumn(item.id)
+                  ? ["re1", "re2"]
+                  : ["re1"];
+                return (
+                  <tr key={item.id}>
+                    <td className="col-achse">{item.label}</td>
+                    {positions.map((pos) => (
+                      <td key={pos} className="col-profiltiefe">
+                        <div className="profiltiefe-input-wrapper">
+                          <button
+                            className="arrow-btn down"
+                            onClick={() => adjustValue(item.id, pos, -1)}>
+                            ▼
+                          </button>
+                          <input
+                            type="number"
+                            step="1"
+                            min="0"
+                            value={formData[`${item.id}_${pos}`] || ""}
+                            onChange={(e) =>
+                              updateField(`${item.id}_${pos}`, e.target.value)
+                            }
+                            placeholder="mm"
+                            className="profiltiefe-input"
+                          />
+                          <button
+                            className="arrow-btn up"
+                            onClick={() => adjustValue(item.id, pos, 1)}>
+                            ▲
+                          </button>
+                        </div>
+                      </td>
+                    ))}
+                    {/* Leere Zelle für Achsen ohne "Rechts innen" */}
+                    {!hasInnerColumn(item.id) && (
+                      <td className="col-profiltiefe"></td>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -372,14 +621,15 @@ function App() {
   };
 
   const renderProfiltiefenLinksTable = (section) => {
-    const positions = ["li1", "li2"];
-
     const adjustValue = (itemId, pos, delta) => {
       const key = `${itemId}_${pos}`;
       const current = parseFloat(formData[key]) || 0;
       const newValue = Math.max(0, current + delta);
       updateField(key, newValue.toString());
     };
+
+    // Nur LKW B-Achse hat "Links innen"
+    const hasInnerColumn = (itemId) => itemId === "lkw_b_achse";
 
     return (
       <div key={section.id} className="section">
@@ -394,38 +644,47 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {section.items.map((item) => (
-                <tr key={item.id}>
-                  <td className="col-achse">{item.label}</td>
-                  {positions.map((pos) => (
-                    <td key={pos} className="col-profiltiefe">
-                      <div className="profiltiefe-input-wrapper">
-                        <button
-                          className="arrow-btn down"
-                          onClick={() => adjustValue(item.id, pos, -1)}>
-                          ▼
-                        </button>
-                        <input
-                          type="number"
-                          step="1"
-                          min="0"
-                          value={formData[`${item.id}_${pos}`] || ""}
-                          onChange={(e) =>
-                            updateField(`${item.id}_${pos}`, e.target.value)
-                          }
-                          placeholder="mm"
-                          className="profiltiefe-input"
-                        />
-                        <button
-                          className="arrow-btn up"
-                          onClick={() => adjustValue(item.id, pos, 1)}>
-                          ▲
-                        </button>
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {section.items.map((item) => {
+                const positions = hasInnerColumn(item.id)
+                  ? ["li1", "li2"]
+                  : ["li1"];
+                return (
+                  <tr key={item.id}>
+                    <td className="col-achse">{item.label}</td>
+                    {positions.map((pos) => (
+                      <td key={pos} className="col-profiltiefe">
+                        <div className="profiltiefe-input-wrapper">
+                          <button
+                            className="arrow-btn down"
+                            onClick={() => adjustValue(item.id, pos, -1)}>
+                            ▼
+                          </button>
+                          <input
+                            type="number"
+                            step="1"
+                            min="0"
+                            value={formData[`${item.id}_${pos}`] || ""}
+                            onChange={(e) =>
+                              updateField(`${item.id}_${pos}`, e.target.value)
+                            }
+                            placeholder="mm"
+                            className="profiltiefe-input"
+                          />
+                          <button
+                            className="arrow-btn up"
+                            onClick={() => adjustValue(item.id, pos, 1)}>
+                            ▲
+                          </button>
+                        </div>
+                      </td>
+                    ))}
+                    {/* Leere Zelle für Achsen ohne "Links innen" */}
+                    {!hasInnerColumn(item.id) && (
+                      <td className="col-profiltiefe"></td>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -459,6 +718,17 @@ function App() {
                     }>
                     {formData[`${item.id}_ok`] ? "✓" : ""}
                   </button>
+                  {!formData[`${item.id}_ok`] &&
+                    item.id !== "modulasi_system" && (
+                      <span
+                        style={{
+                          color: "red",
+                          marginLeft: "4px",
+                          fontSize: "12px",
+                        }}>
+                        *
+                      </span>
+                    )}
                 </td>
                 <td className="col-wann">
                   <input
@@ -731,6 +1001,34 @@ function App() {
                 </button>
                 <button className="btn btn-primary" onClick={exportToHTML}>
                   📄 Als HTML exportieren
+                </button>
+              </div>
+            </div>
+
+            <div
+              className="default-section"
+              style={{
+                marginTop: "30px",
+                border: "2px solid #4CAF50",
+                padding: "15px",
+                borderRadius: "8px",
+              }}>
+              <h4>📝 Für Word-Dokument exportieren</h4>
+              <p className="sync-hint" style={{ marginBottom: "15px" }}>
+                Erstellt eine JSON-Datei mit Platzhaltern für die automatische
+                Befüllung der Word-Vorlage. Alle Pflichtfelder müssen ausgefüllt
+                sein.
+              </p>
+              <div className="sync-buttons">
+                <button
+                  className="btn btn-primary"
+                  onClick={exportForWord}
+                  style={{
+                    backgroundColor: isFormComplete() ? "#4CAF50" : "#ccc",
+                  }}>
+                  {isFormComplete()
+                    ? "✅ Für Word exportieren"
+                    : "⚠️ Formular unvollständig"}
                 </button>
               </div>
             </div>
